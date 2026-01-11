@@ -4,7 +4,7 @@ from fastapi import HTTPException
 from datetime import timedelta
 from apps.models.users import User
 from apps.schemas.userserializer import UserCreate, UserLogin
-from apps.services.auth_service import verify_password, hash_password, create_access_token, verify_token
+from apps.services.auth_service import verify_password, hash_password, create_access_token
 
 
 class UserService:
@@ -24,7 +24,7 @@ class UserService:
             full_name=data.full_name,
             email=data.email,
             password=hash_password(data.password),
-            role='patient'  
+            role=data.role 
         )
         session.add(new_user)
         await session.commit()

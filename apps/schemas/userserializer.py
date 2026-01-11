@@ -1,12 +1,11 @@
-from pydantic import BaseModel, EmailStr, Field, field_validator
+from pydantic import BaseModel, EmailStr, Field, field_validator, validator
 from typing import Optional
-
-from pydantic import BaseModel, validator
 
 class UserCreate(BaseModel):
     full_name: str
     email: str
     password: str
+    role: str
 
     @validator('password')
     def password_max_length(cls, v):
@@ -35,3 +34,6 @@ class TokenResponse(BaseModel):
 
 class TokenData(BaseModel):
     email: Optional[str] = None
+
+class TokenIn(BaseModel):
+    access_token: str    
