@@ -5,31 +5,46 @@ from datetime import timedelta
 from apps.models.users import User
 from apps.schemas.userserializer import UserCreate, UserLogin
 from apps.services.auth_service import verify_password, hash_password, create_access_token
+from apps.models.medical_record import MedicalRecord
 
 
 class UserService:
 
     @staticmethod
-    async def register_user(data: UserCreate, session: AsyncSession):
+    async def register_user(
+        data: UserCreate,
+        session: AsyncSession,
+        current_user: User
+    ):
 
-        result = await session.execute(select(User).where(User.email == data.email))
-        if result.scalar_one_or_none():
-            raise HTTPException(status_code=400, detail='User with this email already exists')
+        if current_user.role != "doctor":
+            raise HTTPException(status_code=403, detail="Only doctor can register patients")
 
-        result = await session.execute(select(User).where(User.full_name == data.full_name))
-        if result.scalar_one_or_none():
-            raise HTTPException(status_code=400, detail='User with this fullname already exists')
+        if await session.scalar(select(User).where(User.email == data.email)):
+            raise HTTPException(status_code=400, detail="User with this email already exists")
 
         new_user = User(
             full_name=data.full_name,
             email=data.email,
             password=hash_password(data.password),
-            role=data.role 
+            role="patient"
         )
         session.add(new_user)
+        await session.flush()
+        
+        medical_record = MedicalRecord(
+            patient_id=new_user.id,
+            doctor_id=current_user.id,
+            diagnosis=None,
+            notes=None
+        )
+        session.add(medical_record)
+
         await session.commit()
         await session.refresh(new_user)
+
         return new_user
+
 
     
     @staticmethod

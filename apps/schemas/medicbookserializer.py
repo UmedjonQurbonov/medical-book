@@ -1,5 +1,6 @@
 from pydantic import BaseModel, Field, field_validator, ConfigDict
 from datetime import datetime
+from typing import Optional
 
 class MedicalRecordCreate(BaseModel):
     patient_id: int
@@ -17,13 +18,18 @@ class UserShort(BaseModel):
 
 class MedicalRecordOut(BaseModel):
     id: int
-    diagnosis: str
-    notes: str
+    diagnosis: Optional[str]
+    notes: Optional[str]
     created_at: datetime
     patient: UserShort
-    doctor: UserShort   
-    
+    doctor: Optional[UserShort]
+
     model_config = ConfigDict(from_attributes=True)
+
+
+class MedicalRecordUpdate(BaseModel):
+    diagnosis: Optional[str] = None
+    notes: Optional[str] = None
 
 
 class AppointmentCreate(BaseModel):
@@ -43,4 +49,8 @@ class AppointmentOut(BaseModel):
     created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
+
+class AppointmentUpdate(BaseModel):
+    complaints: Optional[str] = None
+    status: Optional[str] = None
 

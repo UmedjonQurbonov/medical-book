@@ -4,7 +4,7 @@ from apps.db.base import Base
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
 from apps.db.database import engine
-from apps.routers.auth import user_router, appointment_router
+from apps.routers.auth import user_router, appointment_router, medical_record_router
 
 
 async def init_models():
@@ -22,3 +22,4 @@ app = FastAPI(lifespan=lifespan)
 
 app.include_router(user_router)
 app.include_router(appointment_router)
+app.include_router(medical_record_router)
